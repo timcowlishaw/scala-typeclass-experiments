@@ -22,16 +22,29 @@ object SomeoneElsesLibrary {
 }
 
 object MyClient {
-  import SomeoneElsesLibrary._
 
-  class Client(service : Service) {
-    import ResponseTypeClass._
-    def send[A : TheirResponse](x : A) : Unit = service.send(x) 
+  trait Sender[T] {
+    import SomeoneElsesLibrary.ResponseTypeClass._
+    def sendWith[A : TheirResponse](service : T, x : A) : Unit
+  }
+
+  object Adapters {
+    import SomeoneElsesLibrary.Service
+    import SomeoneElsesLibrary.ResponseTypeClass._
+    implicit object SomeoneElsesServiceSender extends Sender[Service] {
+      def sendWith[A : TheirResponse](service : Service,  x : A) : Unit = service.send(x);
+    } 
+  } 
+
+  class Client[T : Sender](service : T) {
+    import SomeoneElsesLibrary.ResponseTypeClass._
+    def send[A : TheirResponse](x : A) : Unit = implicitly[Sender[T]].sendWith(service, x) 
   }
 }
 
 object Test extends App {
   import MyClient._
+  import MyClient.Adapters._
   import SomeoneElsesLibrary.Service
   val service = new Service
   val client = new Client(service)
