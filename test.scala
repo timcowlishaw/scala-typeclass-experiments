@@ -13,7 +13,7 @@ object SomeoneElsesLibrary {
     }
   }
 
-  object Service {
+  class Service {
     import ResponseTypeClass._
     def send[A : TheirResponse](a : A) : Unit = {
       println(implicitly[TheirResponse[A]].serialized(a));
@@ -26,7 +26,8 @@ object MyClient {
 
   class Client {
     import ResponseTypeClass._
-    def send[A : TheirResponse](x : A) : Unit = Service.send(x) 
+    val service = new Service
+    def send[A : TheirResponse](x : A) : Unit = service.send(x) 
   }
 }
 
