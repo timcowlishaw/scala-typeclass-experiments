@@ -29,8 +29,9 @@ object MyClient {
 
   object Adapters {
     import SomeoneElsesLibrary.Service
+    import SomeoneElsesLibrary.ResponseTypeClass.TheirResponse
     implicit object SomeoneElsesServiceSender extends Sender[Service] {
-      def sendWith[A](service : Service,  x : A) : Unit = service.send(x);
+      def sendWith[A : TheirResponse](service : Service,  x : A) : Unit = service.send(x);
     } 
   } 
 
