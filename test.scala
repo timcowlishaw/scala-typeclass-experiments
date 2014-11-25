@@ -15,8 +15,8 @@ object SomeoneElsesLibrary {
 
   object Service {
     import ResponseTypeClass._
-    def send[A](a : A)(implicit ev : TheirResponse[A]) : Unit  = {
-      println(ev.serialized(a));
+    def send[A : TheirResponse](a : A) : Unit = {
+      println(implicitly[TheirResponse[A]].serialized(a));
     }
   }
 }
@@ -26,7 +26,7 @@ object MyClient {
 
   class Client {
     import ResponseTypeClass._
-    def send[A](x : A)(implicit ev : TheirResponse[A]) : Unit = Service.send(x) 
+    def send[A : TheirResponse](x : A) : Unit = Service.send(x) 
   }
 }
 
