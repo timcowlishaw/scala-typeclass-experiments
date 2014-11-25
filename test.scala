@@ -24,16 +24,17 @@ object SomeoneElsesLibrary {
 object MyClient {
   import SomeoneElsesLibrary._
 
-  class Client {
+  class Client(service : Service) {
     import ResponseTypeClass._
-    val service = new Service
     def send[A : TheirResponse](x : A) : Unit = service.send(x) 
   }
 }
 
 object Test extends App {
   import MyClient._
-  val client = new Client
+  import SomeoneElsesLibrary.Service
+  val service = new Service
+  val client = new Client(service)
   client.send("Hello World")
   client.send(123)
 }
