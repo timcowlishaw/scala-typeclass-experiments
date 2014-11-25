@@ -23,20 +23,23 @@ object SomeoneElsesLibrary {
 
 object MyClient {
 
+  trait Sendable[T]
+  implicit object SendableString extends Sendable[String]
+  implicit object SendableInt extends Sendable[Int]
+
   trait Sender[T] {
-    def sendWith[A](service : T, x : A) : Unit
+    def sendWith[A : Sendable](service : T, x : A) : Unit
   }
 
   object Adapters {
     import SomeoneElsesLibrary.Service
-    import SomeoneElsesLibrary.ResponseTypeClass.TheirResponse
     implicit object SomeoneElsesServiceSender extends Sender[Service] {
-      def sendWith[A : TheirResponse](service : Service,  x : A) : Unit = service.send(x);
+      def sendWith[A : Sendable](service : Service,  x : A) : Unit = service.send(x);
     } 
   } 
 
   class Client[T : Sender](service : T) {
-    def send[A](x : A) : Unit = implicitly[Sender[T]].sendWith(service, x) 
+    def send[A : Sendable](x : A) : Unit = implicitly[Sender[T]].sendWith(service, x) 
   }
 }
 
